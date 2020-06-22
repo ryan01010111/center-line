@@ -25,8 +25,6 @@ const FlightLogSchema = new Schema({
     ccDual: Number,
     ccSolo: Number,
     ccAdditional: Array,
-    ccNight: Number,
-    cc150: Boolean,
     instrumentActual: Number,
     instrumentSim: Number,
     instrumentApproach: Number,
