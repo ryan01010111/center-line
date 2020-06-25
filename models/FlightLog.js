@@ -1,11 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 const FlightLogSchema = new Schema({
-    date: {
-        type: Date,
-        required: true,
-        default: Date.now
-    },
+    date: Date,
     type: String,
     route: String,
     aircraftModel: String,

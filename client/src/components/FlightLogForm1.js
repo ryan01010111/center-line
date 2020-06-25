@@ -69,13 +69,15 @@ const FlightLogForm1 = props => {
                         SelectProps={{ native: true }}
                         variant="filled"
                     >
-                        <option value={0}>0</option>
-                        <option value={10}>10</option>
-                        <option value={20}>20</option>
+                        <option value='standard'>Standard</option>
+                        <option value='checkride'>Checkride</option>
+                        <option value='checkridePrep'>Checkride Prep</option>
+                        <option value='exam'>Exam</option>
                     </TextField>
                 </Grid>
                 <Grid item md={3} />
-                <Grid item xs={12}>
+                <Grid item md={3} />
+                <Grid item xs={6}>
                     <TextField id="route"
                         name="route"
                         label="Route"
@@ -83,7 +85,9 @@ const FlightLogForm1 = props => {
                         variant="filled"
                     />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item md={3} />
+                <Grid item md={3} />
+                <Grid item xs={6}>
                     <TextField id="aircraftModel"
                         name="aircraftModel"
                         label="Aircraft Model"
@@ -91,7 +95,9 @@ const FlightLogForm1 = props => {
                         variant="filled"
                     />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item md={3} />
+                <Grid item md={3} />
+                <Grid item xs={6}>
                     <TextField id="aircraftIdent"
                         name="aircraftIdent"
                         label="Aircraft Ident"
@@ -99,6 +105,7 @@ const FlightLogForm1 = props => {
                         variant="filled"
                     />
                 </Grid>
+                <Grid item md={3} />
                 <Grid item md={4} />
                 <Grid item xs={12} md={4}>
                     <FormControl component="fieldset">

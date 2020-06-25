@@ -5,6 +5,7 @@ import FlightLogForm1 from './FlightLogForm1'
 import FlightLogForm2 from './FlightLogForm2'
 import FlightLogForm3 from './FlightLogForm3'
 import FormStepButtons from './FormStepButtons';
+import FlightLogSummary from './FlightLogSummary'
 
 const useStyles = makeStyles(() => ({
     container: {
@@ -15,7 +16,7 @@ const useStyles = makeStyles(() => ({
 const FlightLog = () => {
     const [data, setData] = useState({
         date: '',
-        type: '',
+        type: 'standard',
         route: '',
         aircraftModel: '',
         aircraftIdent: '',
@@ -36,7 +37,7 @@ const FlightLog = () => {
         ccAdditional: [],
         instrumentActual: '',
         instrumentSim: '',
-        instrumentApproach: '',
+        instrumentApproach: ''
     });
 
     const [step, setStep] = useState(1);
@@ -47,6 +48,22 @@ const FlightLog = () => {
 
     const prevStep = () => {
         setStep(step - 1)
+    }
+
+    const submitLog = async () => {
+        const res = await fetch('/api/logs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'fields': data
+            })
+        })
+        if (res.status !== 200) {
+            return false;
+        }
+        return true;
     }
 
     const renderStep = step => {
@@ -70,6 +87,12 @@ const FlightLog = () => {
                     <FlightLogForm3
                         data={data}
                         onChange={handleChange}
+                    />
+                )
+            case 4:
+                return (
+                    <FlightLogSummary
+                        data={data}
                     />
                 )
             default:
@@ -136,6 +159,7 @@ const FlightLog = () => {
                 step={step}
                 nextStep={nextStep}
                 prevStep={prevStep}
+                submitLog={submitLog}
             />
         </Container>
     )
