@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
     Grid,
     Paper,
@@ -83,7 +84,15 @@ const FlightLogSummary = props => {
         >
             <Grid item xs={12}>
                 <Typography variant="h6">
-                    {date} | {type}
+                    {date} | {
+                        type === 'standard'
+                            ? 'Standard'
+                            : type === 'checkride'
+                                ? 'Checkride'
+                                : type === 'checkridePrep'
+                                    ? 'Checkride Prep'
+                                    : 'Exam'
+                    }
                 </Typography>
             </Grid>
 
@@ -249,6 +258,11 @@ const FlightLogSummary = props => {
             </StyledTableContainer>
         </Grid>
     )
+}
+
+// PropTypes
+FlightLogSummary.propTypes = {
+    data: PropTypes.object.isRequired
 }
 
 export default FlightLogSummary;

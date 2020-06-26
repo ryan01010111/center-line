@@ -3,7 +3,6 @@ import FlightLog from '../../models/FlightLog';
 
 const router = Router();
 
-
 // @route   GET api/logs
 // @desc    fetch all logs
 // @access  Public

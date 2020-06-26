@@ -5,16 +5,14 @@ import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(() => ({
     container: {
-        position: 'fixed',
-        bottom: 50,
-        left: 0
+        margin: '40px 0'
     },
     buttons: {
         width: '100%'
     }
 }));
 
-const FormStepButtons = ({ step, nextStep, prevStep, submitLog }) => {
+const FormStepButtons = ({ step, nextStep, prevStep, validated, submitLog }) => {
     const classes = useStyles();
     return (
         <Grid container
@@ -36,6 +34,7 @@ const FormStepButtons = ({ step, nextStep, prevStep, submitLog }) => {
                 <Button color="primary"
                     className={classes.buttons}
                     variant="contained"
+                    disabled={step === 3 && !validated}
                     onClick={step < 4 ? nextStep : submitLog}
                 >
                     {step === 3
@@ -54,7 +53,8 @@ FormStepButtons.propTypes = {
     nextStep: PropTypes.func.isRequired,
     prevStep: PropTypes.func.isRequired,
     step: PropTypes.number.isRequired,
-    submitLog: PropTypes.func.isRequired
+    submitLog: PropTypes.func.isRequired,
+    validated: PropTypes.bool.isRequired
 }
 
 export default FormStepButtons;

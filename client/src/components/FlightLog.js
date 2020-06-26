@@ -40,14 +40,18 @@ const FlightLog = () => {
         instrumentApproach: ''
     });
 
+    const [validated, setValidated] = useState(true);
+
     const [step, setStep] = useState(1);
 
     const nextStep = () => {
-        setStep(step + 1)
+        const valid = data.date && data.type ? true : false;
+        setValidated(valid);
+        valid && setStep(step + 1);
     }
 
     const prevStep = () => {
-        setStep(step - 1)
+        setStep(step - 1);
     }
 
     const submitLog = async () => {
@@ -72,6 +76,7 @@ const FlightLog = () => {
                 return (
                     <FlightLogForm1
                         data={data}
+                        validated={validated}
                         onChange={handleChange}
                     />
                 )
@@ -144,6 +149,7 @@ const FlightLog = () => {
                 [name]: value
             }
         });
+        ['date', 'type'].includes(name) && setValidated(data.date && data.type ? true : false);
     };
 
     const classes = useStyles();
@@ -159,6 +165,7 @@ const FlightLog = () => {
                 step={step}
                 nextStep={nextStep}
                 prevStep={prevStep}
+                validated={validated}
                 submitLog={submitLog}
             />
         </Container>

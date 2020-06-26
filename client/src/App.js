@@ -1,4 +1,5 @@
 import React from 'react';
+import { AuthProvider } from './contexts/AuthContext'
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 import theme from './theme';
@@ -16,18 +17,19 @@ function App() {
   const classes = useStyles();
 
   return (
-    <div className="App">
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
+      <AuthProvider>
         <AppBar className={classes.appBar}
-          position="static">
+          position="static"
+        >
           <Typography variant="h4">
             Center Line
           </Typography>
         </AppBar>
         <FlightLog />
-      </ThemeProvider>
-    </div>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

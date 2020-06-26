@@ -38,7 +38,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const FlightLogForm1 = props => {
-    const { data, onChange } = props;
+    const { data, validated, onChange } = props;
     const classes = useStyles();
     return (
         <form noValidate
@@ -53,10 +53,13 @@ const FlightLogForm1 = props => {
                     <TextField id="date"
                         name="date"
                         label="Date"
+                        value={data.date}
                         onChange={onChange.bind(this)}
                         InputLabelProps={{ shrink: true }}
                         type="date"
                         variant="filled"
+                        required
+                        error={!validated && !data.date}
                     />
                 </Grid>
                 <Grid item xs={6} md={3}>
@@ -68,6 +71,8 @@ const FlightLogForm1 = props => {
                         onChange={onChange.bind(this)}
                         SelectProps={{ native: true }}
                         variant="filled"
+                        required
+                        error={!validated && !data.type}
                     >
                         <option value='standard'>Standard</option>
                         <option value='checkride'>Checkride</option>
@@ -113,12 +118,11 @@ const FlightLogForm1 = props => {
                             className={classes.radio}
                             aria-label="aircraftClass"
                             name="aircraftClass"
-                            value={
-                                data.aircraftClass.length < 1
-                                    ? ''
-                                    : data.aircraftClass.includes('mel')
-                                        ? 'mel'
-                                        : 'sel'
+                            value={data.aircraftClass.includes('sel')
+                                ? 'sel'
+                                : data.aircraftClass.includes('mel')
+                                    ? 'mel'
+                                    : ''
                                 }
                             onChange={onChange}
                         >
@@ -162,6 +166,7 @@ const FlightLogForm1 = props => {
 // PropTypes
 FlightLogForm1.propTypes = {
     data: PropTypes.object.isRequired,
+    validated: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired
 }
 
