@@ -1,3 +1,9 @@
+const initialState = {
+    id: null,
+    msg: {},
+    status: null
+}
+
 export default (state, action) => {
     switch (action.type) {
         case 'GET_ERRORS':

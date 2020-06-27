@@ -6,7 +6,7 @@ dotenv.config();
 function auth(req, res, next) {
     const token = req.header('x-auth-token');
     if (!token) {
-        return res.status(401).json({error: Unauthorized});
+        return res.status(401).json({error: 'Unauthorized'});
     }
 
     try {

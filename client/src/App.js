@@ -1,8 +1,6 @@
-import React from 'react';
-import { AuthProvider } from './contexts/AuthContext'
-import CssBaseline from '@material-ui/core/CssBaseline';
-import { ThemeProvider } from '@material-ui/core/styles';
-import theme from './theme';
+import React, { useContext, useEffect, useState } from 'react';
+import { AuthContext } from './contexts/AuthContext'
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { AppBar, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import FlightLog from './components/FlightLog'
@@ -10,16 +8,32 @@ import FlightLog from './components/FlightLog'
 const useStyles = makeStyles(() => ({
   appBar: {
     padding: 14
+  },
+  progress: {
+    position: 'absolute',
+    top: '40%',
+    left: 'calc(50% - 20px)'
   }
 }));
 
 function App() {
+  const [authLoaded, setAuthLoaded] = useState(false);
+  const { loadUser } = useContext(AuthContext);
   const classes = useStyles();
 
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
+  useEffect(() => {
+    if (!authLoaded) {
+      loadUser()
+      .then(setAuthLoaded(true));
+    }
+  }, [authLoaded, loadUser]);
+
+  return !authLoaded
+    ? <CircularProgress className={classes.progress}
+      color="secondary"
+    />
+    : (
+      <>
         <AppBar className={classes.appBar}
           position="static"
         >
@@ -28,9 +42,8 @@ function App() {
           </Typography>
         </AppBar>
         <FlightLog />
-      </AuthProvider>
-    </ThemeProvider>
-  );
+      </>
+    )
 }
 
 export default App;
