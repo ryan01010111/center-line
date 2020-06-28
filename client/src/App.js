@@ -1,9 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { AuthContext } from './contexts/AuthContext'
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+
+import { Provider } from 'react-redux';
+import store from './store';
+import { loadUser } from './actions/authActions'
+
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { AppBar, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
-import FlightLog from './components/FlightLog'
+import Login from './components/Login';
+import FlightLog from './components/FlightLog';
 
 const useStyles = makeStyles(() => ({
   appBar: {
@@ -18,31 +24,37 @@ const useStyles = makeStyles(() => ({
 
 function App() {
   const [authLoaded, setAuthLoaded] = useState(false);
-  const { loadUser } = useContext(AuthContext);
   const classes = useStyles();
 
   useEffect(() => {
     if (!authLoaded) {
-      loadUser()
-      .then(setAuthLoaded(true));
+      store.dispatch(loadUser())
+        .then(setAuthLoaded(true));
     }
-  }, [authLoaded, loadUser]);
+  }, [authLoaded]);
 
   return !authLoaded
     ? <CircularProgress className={classes.progress}
       color="secondary"
     />
     : (
-      <>
-        <AppBar className={classes.appBar}
-          position="static"
-        >
-          <Typography variant="h4">
-            Center Line
-          </Typography>
-        </AppBar>
-        <FlightLog />
-      </>
+      <Router>
+        <Provider store={store}>
+          <AppBar className={classes.appBar}
+            position="static"
+          >
+            <Typography variant="h4">
+              Center Line
+            </Typography>
+          </AppBar>
+          <Route path="/login">
+            <Login />
+          </Route>
+          <Route path="/new_log">
+            <FlightLog />
+          </Route>
+        </Provider>
+      </Router>
     )
 }
 

@@ -54,22 +54,6 @@ const FlightLog = () => {
         setStep(step - 1);
     }
 
-    const submitLog = async () => {
-        const res = await fetch('/api/logs', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                'fields': data
-            })
-        })
-        if (res.status !== 200) {
-            return false;
-        }
-        return true;
-    }
-
     const renderStep = step => {
         switch (step) {
             case 1:
@@ -151,6 +135,22 @@ const FlightLog = () => {
         });
         ['date', 'type'].includes(name) && setValidated(data.date && data.type ? true : false);
     };
+    
+    const submitLog = async () => {
+        const res = await fetch('/api/logs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'fields': data
+            })
+        })
+        if (res.status !== 200) {
+            return false;
+        }
+        return true;
+    }
 
     const classes = useStyles();
     return (

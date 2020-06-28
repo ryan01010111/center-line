@@ -1,4 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+import { login } from '../actions/authActions';
+
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -12,13 +17,19 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
-const Login = () => {
+const Login = ({ login, error }) => {
+    const [state, setState] = useState({
+        email: '',
+        password: ''
+    });
+    const [msg, setMsg] = useState(null);
+
     function Copyright() {
         return (
             <Typography variant="body2" color="textSecondary" align="center">
             {'Copyright © '}
-            <Link color="inherit" href="https://material-ui.com/">
-                Your Website
+            <Link color="inherit" href="/">
+                Center Line
             </Link>{' '}
             {new Date().getFullYear()}
             {'.'}
@@ -38,13 +49,41 @@ const Login = () => {
             backgroundColor: theme.palette.secondary.main,
         },
         form: {
-            width: '100%', // Fix IE 11 issue.
+            width: '100%',
             marginTop: theme.spacing(1),
         },
         submit: {
             margin: theme.spacing(3, 0, 2),
         },
     }));
+    
+    useEffect(() => {
+        if (error.id === 'LOGIN_FAIL') {
+            setMsg(error.msg);
+        } else {
+            setMsg(null);
+        }
+    }, [error, msg]);
+
+    const handleChange = e => {
+        let {name, value} = e.target;
+        setState(prevState => {
+            return {
+                ...prevState,
+                [name]: value
+            }
+        });
+    }
+
+    const handleSubmit = e => {
+        e.preventDefault();
+
+        const { email, password } = state;
+        login({
+            email,
+            password
+        });
+    }
 
     const classes = useStyles();
 
@@ -57,7 +96,9 @@ const Login = () => {
             <Typography component="h1" variant="h5">
             Sign in
             </Typography>
-            <form className={classes.form} noValidate>
+            <form className={classes.form} noValidate
+                onSubmit={handleSubmit}
+            >
             <TextField
                 variant="outlined"
                 margin="normal"
@@ -66,6 +107,8 @@ const Login = () => {
                 id="email"
                 label="Email Address"
                 name="email"
+                value={state.email}
+                onChange={handleChange.bind(this)}
                 autoComplete="email"
                 autoFocus
             />
@@ -74,8 +117,10 @@ const Login = () => {
                 margin="normal"
                 required
                 fullWidth
-                name="password"
                 label="Password"
+                name="password"
+                value={state.password}
+                onChange={handleChange.bind(this)}
                 type="password"
                 id="password"
                 autoComplete="current-password"
@@ -114,4 +159,16 @@ const Login = () => {
     );
 }
 
-export default Login;
+//PropTypes
+Login.propTypes = {
+    error: PropTypes.object.isRequired,
+    login: PropTypes.func.isRequired
+}
+
+const mapStateToProps = state => ({
+    error: state.error
+});
+export default connect(
+    mapStateToProps,
+    { login }
+)(Login);
