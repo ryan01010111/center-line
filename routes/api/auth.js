@@ -58,13 +58,13 @@ router.post('/register', (req, res) => {
     const { firstName, lastName, email, password } = req.body;
 
     if (!firstName || !lastName || !email || !password) {
-        return res.status(400).json({error: 'all fields required'});
+        return res.status(400).json({error: 'all fields are required'});
     }
 
     User.findOne({ email })
     .then(user => {
         if (user) {
-            return res.status(400).json({error: 'invalid request'});
+            return res.status(400).json({error: 'email address is already registered'});
         }
 
         bcrypt.genSalt(10, (err, salt) => {

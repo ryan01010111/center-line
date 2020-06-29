@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
 import { login } from '../actions/authActions';
+import { returnErrors } from '../actions/errorActions';
 
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -17,46 +18,47 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
-const Login = ({ login, error }) => {
-    const [state, setState] = useState({
-        email: '',
-        password: ''
-    });
-    const [msg, setMsg] = useState(null);
-
-    function Copyright() {
-        return (
-            <Typography variant="body2" color="textSecondary" align="center">
+function Copyright() {
+    return (
+        <Typography variant="body2" color="textSecondary" align="center">
             {'Copyright © '}
             <Link color="inherit" href="/">
                 Center Line
             </Link>{' '}
             {new Date().getFullYear()}
             {'.'}
-            </Typography>
-        );
-    }
+        </Typography>
+    );
+}
 
-    const useStyles = makeStyles((theme) => ({
-        paper: {
-            marginTop: theme.spacing(8),
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-        },
-        avatar: {
-            margin: theme.spacing(1),
-            backgroundColor: theme.palette.secondary.main,
-        },
-        form: {
-            width: '100%',
-            marginTop: theme.spacing(1),
-        },
-        submit: {
-            margin: theme.spacing(3, 0, 2),
-        },
-    }));
-    
+const useStyles = makeStyles((theme) => ({
+    paper: {
+        marginTop: theme.spacing(8),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+    avatar: {
+        margin: theme.spacing(1),
+        backgroundColor: theme.palette.secondary.main,
+    },
+    form: {
+        width: '100%',
+        marginTop: theme.spacing(1),
+    },
+    submit: {
+        margin: theme.spacing(3, 0, 2),
+    },
+}));
+
+const Login = ({ login, error, returnErrors }) => {
+    const storedUser = localStorage.getItem('rememberUser');
+    const [email, setEmail] = useState(storedUser || '');
+    const [password, setPassword] = useState('');
+    const [rememberUser, setRememberUser] = useState(storedUser ? true : false);
+    const [msg, setMsg] = useState(null);
+    const [labelError, setLabelError] = useState(null);
+
     useEffect(() => {
         if (error.id === 'LOGIN_FAIL') {
             setMsg(error.msg);
@@ -65,24 +67,24 @@ const Login = ({ login, error }) => {
         }
     }, [error, msg]);
 
-    const handleChange = e => {
-        let {name, value} = e.target;
-        setState(prevState => {
-            return {
-                ...prevState,
-                [name]: value
-            }
-        });
-    }
-
     const handleSubmit = e => {
         e.preventDefault();
 
-        const { email, password } = state;
-        login({
-            email,
-            password
-        });
+        let newLabelError = null;
+        if (!email) {
+            returnErrors('Please enter your email address', null, 'LOGIN_FAIL');
+            newLabelError = 'email';
+        } else if (!password) {
+            returnErrors('Please enter your password', null, 'LOGIN_FAIL');
+            newLabelError = 'password';
+        } else {
+            login({
+                email,
+                password,
+                rememberUser
+            });
+        }
+        setLabelError(newLabelError);
     }
 
     const classes = useStyles();
@@ -94,41 +96,56 @@ const Login = ({ login, error }) => {
             <LockOutlined />
             </Avatar>
             <Typography component="h1" variant="h5">
-            Sign in
+                Sign in
             </Typography>
             <form className={classes.form} noValidate
                 onSubmit={handleSubmit}
             >
             <TextField
                 variant="outlined"
+                id="email"
                 margin="normal"
                 required
                 fullWidth
-                id="email"
                 label="Email Address"
                 name="email"
-                value={state.email}
-                onChange={handleChange.bind(this)}
+                value={email}
+                onChange={e => setEmail(e.target.value)}
                 autoComplete="email"
                 autoFocus
+                error={labelError === 'email'}
             />
             <TextField
                 variant="outlined"
+                id="password"
                 margin="normal"
                 required
                 fullWidth
                 label="Password"
                 name="password"
-                value={state.password}
-                onChange={handleChange.bind(this)}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
                 type="password"
-                id="password"
                 autoComplete="current-password"
+                error={labelError === 'password'}
             />
             <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
+                control={
+                    <Checkbox color="primary"
+                        checked={rememberUser}
+                        onChange={() => setRememberUser(!rememberUser)}
+                    />
+                }
                 label="Remember me"
             />
+            {msg &&
+                <Typography variant="body1"
+                    color="error"
+                    align="center"
+                >
+                    {msg}
+                </Typography>
+            }
             <Button
                 type="submit"
                 fullWidth
@@ -145,7 +162,7 @@ const Login = ({ login, error }) => {
                 </Link>
                 </Grid>
                 <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="/register" variant="body2">
                     {"Don't have an account? Sign Up"}
                 </Link>
                 </Grid>
@@ -162,7 +179,8 @@ const Login = ({ login, error }) => {
 //PropTypes
 Login.propTypes = {
     error: PropTypes.object.isRequired,
-    login: PropTypes.func.isRequired
+    login: PropTypes.func.isRequired,
+    returnErrors: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => ({
@@ -170,5 +188,5 @@ const mapStateToProps = state => ({
 });
 export default connect(
     mapStateToProps,
-    { login }
+    { login, returnErrors }
 )(Login);

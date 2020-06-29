@@ -48,7 +48,7 @@ export const loadUser = () => async (dispatch, getState) => {
     }
 }
 
-export const login = ({ email, password }) => async dispatch => {
+export const login = ({ email, password, rememberUser }) => async dispatch => {
     const config = {
         method: 'POST',
         headers: {
@@ -63,6 +63,11 @@ export const login = ({ email, password }) => async dispatch => {
     
     if (res.status === 200) {
         localStorage.setItem('token', data.token);
+        if (rememberUser) {
+            localStorage.setItem('rememberUser', email)
+        } else {
+            localStorage.removeItem('rememberUser')
+        }
         dispatch(clearErrors());
         dispatch({
             type: LOGIN_SUCCESS,
@@ -72,6 +77,41 @@ export const login = ({ email, password }) => async dispatch => {
         dispatch(returnErrors(data.error, res.status, 'LOGIN_FAIL'));
         dispatch({
             type: LOGIN_FAIL
+        });
+    }
+}
+
+export const logout = () => {
+    localStorage.removeItem('token');
+    return {
+        type: LOGOUT_SUCCESS
+    };
+}
+
+export const register = userData => async dispatch => {
+    const config = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    config.body = JSON.stringify(userData);
+
+    const res = await fetch('/api/auth/register', config);
+    const data = await res.json();
+    
+    if (res.status === 200) {
+        localStorage.setItem('token', data.token);
+        dispatch(clearErrors());
+        dispatch({
+            type: REGISTER_SUCCESS,
+            payload: data
+        });
+    } else {
+        dispatch(returnErrors(data.error, res.status, 'REGISTER_FAIL'));
+        dispatch({
+            type: REGISTER_FAIL
         });
     }
 }
