@@ -126,8 +126,16 @@ const FlightLogForm1 = props => {
                                 }
                             onChange={onChange}
                         >
-                            <FormControlLabel value="sel" control={<Radio />} label="SEL" />
-                            <FormControlLabel value="mel" control={<Radio />} label="MEL" />
+                            <FormControlLabel value="sel"
+                                control={<Radio />}
+                                label="SEL"
+                                labelPlacement="bottom"
+                            />
+                            <FormControlLabel value="mel"
+                                control={<Radio />}
+                                label="MEL"
+                                labelPlacement="bottom"
+                            />
                         </RadioGroup>
                     </FormControl>
                 </Grid>
@@ -141,6 +149,7 @@ const FlightLogForm1 = props => {
                                 onChange={onChange}
                                 name="tailwheel" />}
                                 label="Tailwheel"
+                                labelPlacement="bottom"
                             />
                         </FormGroup>
                     </FormControl>
@@ -153,6 +162,7 @@ const FlightLogForm1 = props => {
                                 onChange={onChange}
                                 name="highPerformance" />}
                                 label="High Performance"
+                                labelPlacement="bottom"
                             />
                         </FormGroup>
                     </FormControl>

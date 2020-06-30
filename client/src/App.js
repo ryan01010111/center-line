@@ -7,18 +7,19 @@ import { loadUser } from './actions/authActions'
 
 import { CircularProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
+import Dashboard from './components/Dashboard'
 import Header from './components/layout/Header';
 import Login from './components/Login';
 import Register from './components/Register';
 import FlightLog from './components/FlightLog';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles({
   progress: {
     position: 'absolute',
     top: '40%',
     left: 'calc(50% - 20px)'
   }
-}));
+});
 
 function App() {
   const [authLoaded, setAuthLoaded] = useState(false);
@@ -33,10 +34,11 @@ function App() {
   const classes = useStyles();
   
   return !authLoaded
-    ? <CircularProgress className={classes.progress}
-      color="secondary"
-    />
-    : (
+    ? (
+      <CircularProgress className={classes.progress}
+        color="secondary"
+      />
+    ) : (
       <Router>
         <Provider store={store}>
           <Header />
@@ -49,6 +51,9 @@ function App() {
             </Route>
             <Route path="/new_log">
               <FlightLog />
+            </Route>
+            <Route path="/">
+              <Dashboard />
             </Route>
           </Switch>
         </Provider>

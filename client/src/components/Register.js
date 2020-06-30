@@ -208,8 +208,8 @@ const Register = ({ register, error, returnErrors }) => {
                 </Button>
                 <Grid container justify="center">
                     <Grid item>
-                        <Link href="#" variant="body2">
-                            Already have an account? Sign in
+                        <Link href="/login" variant="body2">
+                            Already have an account? Log in
                         </Link>
                     </Grid>
                 </Grid>
