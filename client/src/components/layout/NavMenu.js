@@ -10,9 +10,13 @@ import {
     ListItemIcon,
     ListItemText
 } from '@material-ui/core/';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import ExitToApp from '@material-ui/icons/ExitToApp';
+import EqualizerIcon from '@material-ui/icons/Equalizer';
+import ListAltIcon from '@material-ui/icons/ListAlt';
+import QueueIcon from '@material-ui/icons/Queue';
 
-const NavMenu = ({ display, toggleDisplay, smallDisplay, logout }) => {
+const NavMenu = ({ display, toggleDisplay, smallDisplay, logout, user }) => {
     return (
         <Drawer anchor="right"
             open={display}
@@ -23,19 +27,27 @@ const NavMenu = ({ display, toggleDisplay, smallDisplay, logout }) => {
                 onClick={toggleDisplay}
                 onKeyDown={toggleDisplay}
             >
-                {smallDisplay &&
-                    <List>
-                        <ListItem button
-                            onClick={logout}
-                        >
-                            <ListItemIcon>
-                                <InboxIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Logout" />
-                        </ListItem>
-                    </List>
-                }
+                <List>
+                    <ListItem button>
+                        <ListItemIcon>
+                            <AccountCircleIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={user.email} />
+                    </ListItem>
+                    
+                    <ListItem button
+                        onClick={logout}
+                        style={{ paddingLeft: 40 }}
+                    >
+                        <ListItemIcon>
+                            <ExitToApp />
+                        </ListItemIcon>
+                        <ListItemText primary="Logout" />
+                    </ListItem>
+                </List>
+
                 <Divider />
+
                 <List>
                     {smallDisplay &&
                         <ListItem button
@@ -43,19 +55,30 @@ const NavMenu = ({ display, toggleDisplay, smallDisplay, logout }) => {
                             to="/"
                         >
                             <ListItemIcon>
-                                <InboxIcon />
+                                <EqualizerIcon />
                             </ListItemIcon>
                             <ListItemText primary="Dashboard" />
                         </ListItem>
                     }
+
+                    <ListItem button
+                        component={Link}
+                        to="/logbook"
+                    >
+                        <ListItemIcon>
+                            <ListAltIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Logbook" />
+                    </ListItem>
+
                     <ListItem button
                         component={Link}
                         to="/new_log"
                     >
                         <ListItemIcon>
-                            <InboxIcon />
+                            <QueueIcon />
                         </ListItemIcon>
-                        <ListItemText primary="Logbook" />
+                        <ListItemText primary="New Log" />
                     </ListItem>
                 </List>
             </div>
@@ -68,7 +91,8 @@ NavMenu.propTypes = {
     display: PropTypes.bool.isRequired,
     logout: PropTypes.func.isRequired,
     smallDisplay: PropTypes.bool.isRequired,
-    toggleDisplay: PropTypes.func.isRequired
+    toggleDisplay: PropTypes.func.isRequired,
+    user: PropTypes.object.isRequired
 }
 
 export default NavMenu;

@@ -7,10 +7,11 @@ import { loadUser } from './actions/authActions'
 
 import { CircularProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
+import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './components/Dashboard'
 import Header from './components/layout/Header';
-import Login from './components/Login';
-import Register from './components/Register';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
 import FlightLog from './components/FlightLog';
 
 const useStyles = makeStyles({
@@ -27,38 +28,41 @@ function App() {
   useEffect(() => {
     if (!authLoaded) {
       store.dispatch(loadUser())
-        .then(setAuthLoaded(true));
+        .then(() => setAuthLoaded(true));
     }
   }, [authLoaded]);
 
   const classes = useStyles();
   
-  return !authLoaded
-    ? (
-      <CircularProgress className={classes.progress}
-        color="secondary"
-      />
-    ) : (
-      <Router>
-        <Provider store={store}>
-          <Header />
-          <Switch>
-            <Route path="/login">
-              <Login />
-            </Route>
-            <Route path="/register">
-              <Register />
-            </Route>
-            <Route path="/new_log">
-              <FlightLog />
-            </Route>
-            <Route path="/">
-              <Dashboard />
-            </Route>
-          </Switch>
-        </Provider>
-      </Router>
-    )
+  return (
+    <Router>
+      <Provider store={store}>
+        <Header />
+        {!authLoaded
+          ? (
+            <CircularProgress className={classes.progress}
+              color="secondary"
+            />
+          ) : (
+            <Switch>
+              <Route path="/login">
+                <Login />
+              </Route>
+              <Route path="/register">
+                <Register />
+              </Route>
+              <ProtectedRoute path="/new_log"
+                component={FlightLog}
+              />
+              <ProtectedRoute path="/"
+                component={Dashboard}
+              />
+            </Switch>
+          )
+        }
+      </Provider>
+    </Router>
+  )
 }
 
 export default App;

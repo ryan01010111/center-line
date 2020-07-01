@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
     }
   }));
 
-const Header = ({ isAuthenticated, logout }) => {
+const Header = ({ isAuthenticated, logout, user }) => {
     const [displayMenu, setDisplayMenu] = useState(false);
     const path = useLocation().pathname;
     const smallDisplay = useMediaQuery('(max-width: 600px)');
@@ -92,6 +92,7 @@ const Header = ({ isAuthenticated, logout }) => {
                             display={displayMenu}
                             toggleDisplay={toggleDisplay}
                             smallDisplay={smallDisplay}
+                            user={user}
                             logout={logout}
                         />
                     </>
@@ -104,11 +105,13 @@ const Header = ({ isAuthenticated, logout }) => {
 // PropTypes
 Header.propTypes = {
     isAuthenticated: PropTypes.bool.isRequired,
-    logout: PropTypes.func.isRequired
+    logout: PropTypes.func.isRequired,
+    user: PropTypes.object
 }
 
 const mapStateToProps = state => ({
-    isAuthenticated: state.auth.isAuthenticated
+    isAuthenticated: state.auth.isAuthenticated,
+    user: state.auth.user
 });
 export default connect(
     mapStateToProps,
