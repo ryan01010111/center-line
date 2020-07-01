@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import { Schema } from 'mongoose';
 
 const FlightLogSchema = new Schema({
     date: Date,
@@ -26,5 +26,4 @@ const FlightLogSchema = new Schema({
     instrumentApproach: Number,
 });
 
-const FlightLog = mongoose.model('FlightLog', FlightLogSchema);
-export default FlightLog;
+export default FlightLogSchema;

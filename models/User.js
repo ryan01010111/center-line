@@ -1,4 +1,5 @@
 import mongoose, {Schema} from 'mongoose';
+import FlightLogSchema from './FlightLogSchema';
 
 const UserSchema = new Schema({
     firstName: {
@@ -17,7 +18,8 @@ const UserSchema = new Schema({
     password: {
         type: String,
         required: true
-    }
+    },
+    logs: [FlightLogSchema]
 });
 
 const User = mongoose.model('User', UserSchema);
