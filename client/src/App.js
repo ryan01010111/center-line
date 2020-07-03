@@ -12,6 +12,7 @@ import Dashboard from './components/Dashboard'
 import Header from './components/layout/Header';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
+import Logbook from './components/Logbook';
 import FlightLog from './components/FlightLog';
 
 const useStyles = makeStyles({
@@ -51,6 +52,9 @@ function App() {
               <Route path="/register">
                 <Register />
               </Route>
+              <ProtectedRoute path="/logbook"
+                component={Logbook}
+              />
               <ProtectedRoute path="/new_log"
                 component={FlightLog}
               />
