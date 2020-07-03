@@ -5,7 +5,10 @@ import { connect } from 'react-redux';
 import { getLogs } from '../actions/logActions';
 
 import {
+    Button,
     CircularProgress,
+    Collapse,
+    Container,
     List,
     ListItem,
     ListItemText,
@@ -18,14 +21,27 @@ const useStyles = makeStyles({
       position: 'absolute',
       top: '40%',
       left: 'calc(50% - 20px)'
+    },
+    root: {
+        marginTop: 40,
+        '& ul': {
+            padding: 0
+        }
+    },
+    year: {
+        width: '100%',
+        border: '2px solid #fff000'
     }
   });
 
-const months = [ "January", "February", "March", "April", "May", "June", 
+const monthNames = [ "January", "February", "March", "April", "May", "June", 
     "July", "August", "September", "October", "November", "December" ];
+const today = new Date();
 
 const Logbook = ({ getLogs, logs }) => {
     const [logsLoaded, setLogsLoaded] = useState(false);
+    const [openYear, setOpenYear] = useState(`year-${today.getFullYear()}`);
+    const [openMonth, setOpenMonth] = useState(`month-${today.getMonth()}`);
 
     useEffect(() => {
         if (!logsLoaded) {
@@ -36,52 +52,55 @@ const Logbook = ({ getLogs, logs }) => {
 
     const renderLogs = () => {
         const years = {};
-        let minYear = 0;
-        let maxYear = 0;
 
         logs.forEach(log => {
-            const logDate = new Date(log.date);
-            const year = logDate.getFullYear();
-            const month = logDate.getMonth();
-            minYear = Math.min(minYear, year);
-            maxYear = Math.max(maxYear, year);
-            
+            const date = new Date(log.date);
+            const year = date.getFullYear();
+            const month = date.getMonth();
+        
             if (!years[year]) {
-                years[year] = [];
+                years[year] = [...Array(12)].map(y => []);
             }
-
-            if (!years[year][month]) {
-                years[year][month] = []
-            }
-                
-            years[year][month].push (
-                <ListItem button key={log._id}>
-                    <ListItemText primary={log.duration} />
-                </ListItem>
+        
+            years[year][month].push(
+                <Collapse key={log._id} in={openMonth === `month-${month}`}>
+                    <ListItem button>
+                        <ListItemText primary={date.toLocaleDateString()} />
+                    </ListItem>
+                </Collapse>
             );
         });
-
-        const genYear = (year, months, key) => (
-                <li key={`year-${key}`}>
+        
+        return Object.keys(years).map(year => {
+            return (
+                <li key={`year-${year}`}>
                     <ul>
-                        <ListSubheader>{year}</ListSubheader>
-                        {months}
+                        <ListSubheader component={Button}
+                        className={classes.year}
+                            onClick={() => setOpenYear(openYear !== `year-${year}` ? `year-${year}` : '')}
+                        >
+                            {year}
+                        </ListSubheader>
+                        <Collapse in={openYear === `year-${year}`}>
+                            {years[year].map((month, index) => {
+                                return (
+                                    <li key={`month-${monthNames[index]}`}>
+                                        <ul>
+                                            <ListSubheader component={Button}
+                                                onClick={() => setOpenMonth(openMonth !== `month-${index}` ? `month-${index}` : '')}
+                                            >
+                                                {monthNames[index]}
+                                                </ListSubheader>
+                                            {month}
+                                        </ul>
+                                    </li>
+                                );
+                            })}
+                        </Collapse>
                     </ul>
                 </li>
-        );
-
-        const genMonth = (month, logs, key) => (
-            <li key={`month-${key}`}>
-                <ul>
-                    <ListSubheader>{month}</ListSubheader>
-                    {logs}
-                </ul>
-            </li>
-    );
-
-        const monthList = months.map((month, index) => genMonth(month, logList, index));
-
-        return monthList;
+            );
+        });
     }
     
     const classes = useStyles();
@@ -92,9 +111,11 @@ const Logbook = ({ getLogs, logs }) => {
               color="secondary"
             />
         ) : (
-            <List>
-                {renderLogs()}
-            </List>
+            <Container className={classes.root}>
+                <List subheader={<li />}>
+                    {renderLogs()}
+                </List>
+            </Container>
         )
 }
 
