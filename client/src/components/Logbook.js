@@ -13,10 +13,20 @@ import {
     ListItem,
     ListItemText,
     ListSubheader,
+    Typography,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
+import FlightLogSummary from './FlightLogSummary';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
+    month: {
+        top: 60,
+        zIndex: 2,
+        justifyContent: 'left',
+        borderBottom: '1px solid #777',
+        borderRadius: 0,
+        color: `${theme.palette.primary.light}`,
+    },
     progress: {
       position: 'absolute',
       top: '40%',
@@ -26,13 +36,21 @@ const useStyles = makeStyles({
         marginTop: 40,
         '& ul': {
             padding: 0
+        },
+        '& .MuiListSubheader-root': {
+            width: '100%',
+            backgroundColor: `${theme.palette.background.default}`,
+            '&:hover': {
+                backgroundColor: '#555'
+            }
         }
     },
     year: {
-        width: '100%',
-        border: '2px solid #fff000'
+        marginTop: 4,
+        zIndex: 3,
+        border: `2px solid ${theme.palette.secondary.main}`
     }
-  });
+}));
 
 const monthNames = [ "January", "February", "March", "April", "May", "June", 
     "July", "August", "September", "October", "November", "December" ];
@@ -42,6 +60,7 @@ const Logbook = ({ getLogs, logs }) => {
     const [logsLoaded, setLogsLoaded] = useState(false);
     const [openYear, setOpenYear] = useState(`year-${today.getFullYear()}`);
     const [openMonth, setOpenMonth] = useState(`month-${today.getMonth()}`);
+    const [selectedLog, setSelectedLog] = useState(null);
 
     useEffect(() => {
         if (!logsLoaded) {
@@ -63,20 +82,21 @@ const Logbook = ({ getLogs, logs }) => {
             }
         
             years[year][month].push(
-                <Collapse key={log._id} in={openMonth === `month-${month}`}>
-                    <ListItem button>
-                        <ListItemText primary={date.toLocaleDateString()} />
-                    </ListItem>
-                </Collapse>
+                <ListItem button key={log._id}
+                    onClick={() => setSelectedLog(log)}
+                >
+                    <ListItemText primary={date.toLocaleDateString()} />
+                </ListItem>
             );
         });
         
         return Object.keys(years).map(year => {
             return (
                 <li key={`year-${year}`}>
-                    <ul>
+                    <List>
                         <ListSubheader component={Button}
-                        className={classes.year}
+
+                            className={classes.year}
                             onClick={() => setOpenYear(openYear !== `year-${year}` ? `year-${year}` : '')}
                         >
                             {year}
@@ -87,17 +107,20 @@ const Logbook = ({ getLogs, logs }) => {
                                     <li key={`month-${monthNames[index]}`}>
                                         <ul>
                                             <ListSubheader component={Button}
+                                                className={classes.month}
                                                 onClick={() => setOpenMonth(openMonth !== `month-${index}` ? `month-${index}` : '')}
                                             >
                                                 {monthNames[index]}
-                                                </ListSubheader>
-                                            {month}
+                                            </ListSubheader>
+                                            <Collapse key={`month-${index}`} in={openMonth === `month-${index}`}>
+                                                {month}
+                                            </Collapse>
                                         </ul>
                                     </li>
                                 );
                             })}
                         </Collapse>
-                    </ul>
+                    </List>
                 </li>
             );
         });
@@ -110,13 +133,23 @@ const Logbook = ({ getLogs, logs }) => {
             <CircularProgress className={classes.progress}
               color="secondary"
             />
-        ) : (
-            <Container className={classes.root}>
-                <List subheader={<li />}>
-                    {renderLogs()}
-                </List>
-            </Container>
-        )
+        ) : !selectedLog
+            ? (
+                <Container className={classes.root}>
+                    <Typography variant="h4" align="center">Logbook</Typography>
+                    <List subheader={<li />} style={{ marginTop: 16 }}>
+                        {renderLogs()}
+                    </List>
+                </Container>
+            ) : (
+                <Container>
+                    <FlightLogSummary
+                        data={selectedLog}
+                        fromLogbook={true}
+                        closeSummary={() => setSelectedLog('')}
+                    />
+                </Container>
+            )
 }
 
 // PropTypes

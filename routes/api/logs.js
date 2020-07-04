@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import mongoose from 'mongoose';
 import auth from '../../middleware/auth';
 import User from '../../models/User';
 
@@ -8,9 +9,30 @@ const router = Router();
 // @desc    fetch all logs
 // @access  Private
 router.get('/', auth, (req, res) => {
-    User.findById(req.user.id)
-        .then(user => res.json(user.logs))
-        .catch(err => res.json(err));
+    User.aggregate([
+        {
+            "$match": { '_id': new mongoose.Types.ObjectId(req.user.id) }
+        },
+        {
+            "$unwind": "$logs"
+        },
+        {
+            "$sort": {
+                "logs.date": 1
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "logs": 1
+            }
+        }
+    ])
+    .then(result => {
+        let logs = result.map(i => i.logs)
+        res.json(logs);
+    })
+    .catch(err => res.json(err));
 });
 
 // @route   GET api/logs/:id

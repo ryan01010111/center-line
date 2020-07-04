@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
+    Button,
     Grid,
     Paper,
     Table,
@@ -16,7 +17,16 @@ import { makeStyles, withStyles } from '@material-ui/styles';
 const useStyles = makeStyles({
     container: {
         marginTop: 18,
-        marginBottom: 30
+        marginBottom: 30,
+
+        '& .MuiGrid-item:first-child': {
+            display: 'flex',
+            justifyContent: 'space-between'
+        },
+
+        '& .MuiTypography-root': {
+            display: 'inline-flex'
+        }
     }
 });
 
@@ -51,8 +61,8 @@ const BlueGridItem = withStyles((theme) => ({
 const FlightLogSummary = props => {
     const classes = useStyles();
 
+    const date = (new Date(props.data.date)).toLocaleDateString();
     const {
-        date,
         type,
         route,
         aircraftModel,
@@ -94,6 +104,13 @@ const FlightLogSummary = props => {
                                     : 'Exam'
                     }
                 </Typography>
+                {props.fromLogbook && (
+                    <Button variant="outlined" color="secondary"
+                        onClick={props.closeSummary}
+                    >
+                        Back
+                    </Button>
+                )}
             </Grid>
 
             <StyledTableContainer component={Paper}>
@@ -262,7 +279,9 @@ const FlightLogSummary = props => {
 
 // PropTypes
 FlightLogSummary.propTypes = {
-    data: PropTypes.object.isRequired
+    closeSummary: PropTypes.func,
+    data: PropTypes.object.isRequired,
+    fromLogbook: PropTypes.bool
 }
 
 export default FlightLogSummary;

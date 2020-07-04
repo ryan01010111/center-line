@@ -13,6 +13,7 @@ export const getLogs = () => async (dispatch, getState) => {
             type: LOGS_LOADED,
             payload: data
         });
+        dispatch(clearErrors());
     } else {
         dispatch(returnErrors(data.error, res.status));
     }
