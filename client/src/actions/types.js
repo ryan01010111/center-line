@@ -12,3 +12,6 @@ export const CLEAR_ERRORS = 'CLEAR_ERRORS';
 
 export const LOGS_LOADING = 'LOGS_LOADING';
 export const LOGS_LOADED = 'LOGS_LOADED';
+export const ADD_LOG = 'ADD_LOG';
+export const UPDATE_LOG = 'UPDATE_LOG';
+export const DELETE_LOG = 'DELETE_LOG';

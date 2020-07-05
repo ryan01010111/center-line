@@ -1,4 +1,10 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+import { addLog } from '../actions/logActions';
+import { updateLog } from '../actions/logActions';
+import { clearErrors } from '../actions/errorActions';
 
 import { Container, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
@@ -7,6 +13,8 @@ import FlightLogForm2 from './FlightLogForm2'
 import FlightLogForm3 from './FlightLogForm3'
 import FormStepButtons from './FormStepButtons';
 import FlightLogSummary from './FlightLogSummary'
+import AddErrorDialog from './AddErrorDialog';
+import AddSuccessDialog from './AddSuccessDialog';
 
 const useStyles = makeStyles(() => ({
     container: {
@@ -14,36 +22,57 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-const FlightLog = () => {
-    const [data, setData] = useState({
-        date: '',
-        type: 'standard',
-        route: '',
-        aircraftModel: '',
-        aircraftIdent: '',
-        aircraftClass: [],
-        duration: '',
-        nightTime: '',
-        dual: '',
-        pic: '',
-        takeoffDay: '',
-        landDay: '',
-        takeoffNight: '',
-        landNight: '',
-        takeoffTower: '',
-        landTower: '',
-        maneuver: '',
-        ccDual: '',
-        ccSolo: '',
-        ccAdditional: [],
-        instrumentActual: '',
-        instrumentSim: '',
-        instrumentApproach: ''
-    });
+const FlightLog = ({ addLog, error, clearErrors, log, updateLog }) => {
+    let fields = null;
+    if (log) {
+        const {
+            type, route, aircraftModel, aircraftIdent,
+            aircraftClass, duration, nightTime, dual, pic, takeoffDay,
+            landDay, takeoffNight, landNight, takeoffTower, landTower,
+            maneuver, ccDual, ccSolo, ccAdditional, instrumentActual,
+            instrumentSim, instrumentApproach
+        } = log;
+        const date = (new Date(log.date)).toISOString().split('T')[0];
+        fields = {
+            date, type, route, aircraftModel, aircraftIdent,
+            aircraftClass, duration, nightTime, dual, pic, takeoffDay,
+            landDay, takeoffNight, landNight, takeoffTower, landTower,
+            maneuver, ccDual, ccSolo, ccAdditional, instrumentActual,
+            instrumentSim, instrumentApproach
+        }
+    }
+    
+    const [data, setData] = useState(
+        fields || {
+            date: '',
+            type: 'standard',
+            route: '',
+            aircraftModel: '',
+            aircraftIdent: '',
+            aircraftClass: [],
+            duration: '',
+            nightTime: '',
+            dual: '',
+            pic: '',
+            takeoffDay: '',
+            landDay: '',
+            takeoffNight: '',
+            landNight: '',
+            takeoffTower: '',
+            landTower: '',
+            maneuver: '',
+            ccDual: '',
+            ccSolo: '',
+            ccAdditional: [],
+            instrumentActual: '',
+            instrumentSim: '',
+            instrumentApproach: ''
+        }
+    );
 
     const [validated, setValidated] = useState(true);
-
     const [step, setStep] = useState(1);
+    const [submitSuccess, setSubmitSuccess] = useState(false);
 
     const nextStep = () => {
         const valid = data.date && data.type ? true : false;
@@ -138,19 +167,13 @@ const FlightLog = () => {
     };
     
     const submitLog = async () => {
-        const res = await fetch('/api/logs', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                'fields': data
-            })
-        })
-        if (res.status !== 200) {
-            return false;
+        if (!log) {
+            addLog(data)
+                .then(success => success && setSubmitSuccess(true));
+        } else {
+            updateLog(data, log._id)
+                .then(success => success && setSubmitSuccess(true));
         }
-        return true;
     }
 
     const classes = useStyles();
@@ -159,7 +182,7 @@ const FlightLog = () => {
             <Typography variant="h4"
                 align="center"
             >
-                New Log
+                {log ? 'Edit Log' : 'New Log'}
             </Typography>
             {renderStep(step)}
             <FormStepButtons
@@ -169,8 +192,34 @@ const FlightLog = () => {
                 validated={validated}
                 submitLog={submitLog}
             />
+            <AddErrorDialog
+                open={error.id === 'ADD_LOG_FAIL' || error.id === 'UPDATE_LOG_FAIL'}
+                title={'Oops...'}
+                msg={`There was a problem submitting your log. Please try again.`}
+                close={clearErrors}
+                resubmit={submitLog}
+            />
+            <AddSuccessDialog
+                open={submitSuccess}
+                title={'Log entry successful'}
+            />
         </Container>
     )
 }
 
-export default FlightLog;
+// PropTypes
+FlightLog.propTypes = {
+    addLog: PropTypes.func.isRequired,
+    clearErrors: PropTypes.func.isRequired,
+    error: PropTypes.object.isRequired,
+    log: PropTypes.object,
+    updateLog: PropTypes.func.isRequired
+}
+
+const mapStateToProps = state => ({
+    error: state.error
+});
+export default connect(
+    mapStateToProps,
+    { addLog, updateLog, clearErrors }
+)(FlightLog);

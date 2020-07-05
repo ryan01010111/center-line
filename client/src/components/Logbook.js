@@ -2,27 +2,57 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
-import { getLogs } from '../actions/logActions';
+import { getLogs, deleteLog } from '../actions/logActions';
+import { clearErrors } from '../actions/errorActions';
 
 import {
     Button,
     CircularProgress,
     Collapse,
     Container,
+    Fab,
     List,
     ListItem,
     ListItemText,
     ListSubheader,
     Typography,
 } from '@material-ui/core';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import CloseIcon from '@material-ui/icons/Close';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import { makeStyles } from '@material-ui/styles';
 import FlightLogSummary from './FlightLogSummary';
+import FlightLog from './FlightLog';
+import DeleteConfirmation from './DeleteConfirmation';
+import DeleteErrorDialog from './DeleteErrorDialog';
+import DeleteSuccessDialog from './DeleteSuccessDialog';
 
 const useStyles = makeStyles(theme => ({
+    actionBtns: {
+        position: 'sticky',
+        bottom: 40,
+        right: 40,
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'flex-end',
+        
+        '& button': {
+            marginLeft: 12
+        }
+    },
+    cancelEditBtn: {
+        position: 'sticky',
+        bottom: 12,
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center'
+    },
     month: {
-        top: 60,
+        top: 68,
         zIndex: 2,
-        justifyContent: 'left',
+        justifyContent: 'space-between',
         borderBottom: '1px solid #777',
         borderRadius: 0,
         color: `${theme.palette.primary.light}`,
@@ -34,6 +64,7 @@ const useStyles = makeStyles(theme => ({
     },
     root: {
         marginTop: 40,
+        marginBottom: 40,
         '& ul': {
             padding: 0
         },
@@ -46,6 +77,7 @@ const useStyles = makeStyles(theme => ({
         }
     },
     year: {
+        top: 8,
         marginTop: 4,
         zIndex: 3,
         border: `2px solid ${theme.palette.secondary.main}`
@@ -56,11 +88,14 @@ const monthNames = [ "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December" ];
 const today = new Date();
 
-const Logbook = ({ getLogs, logs }) => {
+const Logbook = ({ getLogs, logs, deleteLog, error, clearErrors }) => {
     const [logsLoaded, setLogsLoaded] = useState(false);
     const [openYear, setOpenYear] = useState(`year-${today.getFullYear()}`);
-    const [openMonth, setOpenMonth] = useState(`month-${today.getMonth()}`);
+    const [openMonth, setOpenMonth] = useState(`${today.getFullYear()}-${today.getMonth()}`);
     const [selectedLog, setSelectedLog] = useState(null);
+    const [editMode, setEditMode] = useState(false);
+    const [showDelConf, setShowDelConf] = useState(false);
+    const [deleteSuccess, setDeleteSuccess] = useState(false);
 
     useEffect(() => {
         if (!logsLoaded) {
@@ -95,7 +130,6 @@ const Logbook = ({ getLogs, logs }) => {
                 <li key={`year-${year}`}>
                     <List>
                         <ListSubheader component={Button}
-
                             className={classes.year}
                             onClick={() => setOpenYear(openYear !== `year-${year}` ? `year-${year}` : '')}
                         >
@@ -108,11 +142,12 @@ const Logbook = ({ getLogs, logs }) => {
                                         <ul>
                                             <ListSubheader component={Button}
                                                 className={classes.month}
-                                                onClick={() => setOpenMonth(openMonth !== `month-${index}` ? `month-${index}` : '')}
+                                                onClick={() => setOpenMonth(openMonth !== `${year}-${index}` ? `${year}-${index}` : '')}
                                             >
                                                 {monthNames[index]}
+                                                {openMonth === `${year}-${index}` ? <ExpandLess /> : <ExpandMore />}
                                             </ListSubheader>
-                                            <Collapse key={`month-${index}`} in={openMonth === `month-${index}`}>
+                                            <Collapse key={`month-${index}`} in={openMonth === `${year}-${index}`}>
                                                 {month}
                                             </Collapse>
                                         </ul>
@@ -123,7 +158,15 @@ const Logbook = ({ getLogs, logs }) => {
                     </List>
                 </li>
             );
-        });
+        }).reverse();
+    }
+    
+    const handleDelete = () => {
+        if (selectedLog) {
+            deleteLog(selectedLog._id)
+                .then(success => success && setDeleteSuccess(true));
+        }
+        setSelectedLog(false);
     }
     
     const classes = useStyles();
@@ -140,29 +183,70 @@ const Logbook = ({ getLogs, logs }) => {
                     <List subheader={<li />} style={{ marginTop: 16 }}>
                         {renderLogs()}
                     </List>
-                </Container>
-            ) : (
-                <Container>
-                    <FlightLogSummary
-                        data={selectedLog}
-                        fromLogbook={true}
-                        closeSummary={() => setSelectedLog('')}
+                    <DeleteErrorDialog
+                        open={error.id === 'DELETE_LOG_FAIL'}
+                        close={clearErrors}
+                    />
+                    <DeleteSuccessDialog
+                        open={deleteSuccess}
+                        close={() => setDeleteSuccess(false)}
                     />
                 </Container>
-            )
+            ) : !editMode
+                ? (
+                    <Container>
+                        <FlightLogSummary
+                            data={selectedLog}
+                            fromLogbook={true}
+                            closeSummary={() => setSelectedLog(null)}
+                        />
+                        <div className={classes.actionBtns}>
+                            <Fab color="secondary" aria-label="edit"
+                                onClick={() => setEditMode(true)}
+                            >
+                                <EditIcon />
+                            </Fab>
+                            <Fab color="default" aria-label="delete"
+                                onClick={() => setShowDelConf(true)}
+                            >
+                                <DeleteIcon />
+                            </Fab>
+                            <DeleteConfirmation
+                                open={showDelConf}
+                                close={() => setShowDelConf(false)}
+                                handleDelete={() => handleDelete()}
+                            />
+                        </div>
+                    </Container>
+                ) : (
+                    <Container>
+                        <FlightLog log={selectedLog} />
+                        <div className={classes.cancelEditBtn}>
+                            <Fab size="small" color="default"
+                                aria-label="cancel"
+                                onClick={() => setEditMode(false)}
+                            >
+                                <CloseIcon />
+                            </Fab>
+                        </div>
+                    </Container>
+                )
 }
 
 // PropTypes
 Logbook.propTypes = {
+    clearErrors: PropTypes.func.isRequired,
+    deleteLog: PropTypes.func.isRequired,
+    error: PropTypes.object.isRequired,
     getLogs: PropTypes.func.isRequired,
     logs: PropTypes.array.isRequired
 }
 
 const mapStateToProps = state => ({
+    error: state.error,
     logs: state.log.logs
 });
 export default connect(
     mapStateToProps,
-    { getLogs }
-)
-(Logbook);
+    { getLogs, deleteLog, clearErrors }
+)(Logbook);

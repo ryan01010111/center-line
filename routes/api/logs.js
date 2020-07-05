@@ -18,7 +18,7 @@ router.get('/', auth, (req, res) => {
         },
         {
             "$sort": {
-                "logs.date": 1
+                "logs.date": -1
             }
         },
         {
@@ -88,7 +88,7 @@ router.delete('/:id', auth, (req, res) => {
             user.logs.pull(req.params.id);
             user.save();
         })
-        .then(() => res.json({success: true}))
+        .then(() => res.json({ _id: req.params.id }))
         .catch(err => res.json(err));
 });
 

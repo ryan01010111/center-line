@@ -83,10 +83,11 @@ const FlightLogForm1 = props => {
                 </Grid>
                 <Grid item md={3} />
                 <Grid item md={3} />
-                <Grid item xs={6}>
+                <Grid item xs={12} md={6}>
                     <TextField id="route"
                         name="route"
                         label="Route"
+                        value={data.route}
                         onChange={onChange.bind(this)}
                         variant="filled"
                     />
@@ -97,6 +98,7 @@ const FlightLogForm1 = props => {
                     <TextField id="aircraftModel"
                         name="aircraftModel"
                         label="Aircraft Model"
+                        value={data.aircraftModel}
                         onChange={onChange.bind(this)}
                         variant="filled"
                     />
@@ -107,6 +109,7 @@ const FlightLogForm1 = props => {
                     <TextField id="aircraftIdent"
                         name="aircraftIdent"
                         label="Aircraft Ident"
+                        value={data.aircraftIdent}
                         onChange={onChange.bind(this)}
                         variant="filled"
                     />
