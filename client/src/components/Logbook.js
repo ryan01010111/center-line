@@ -1,28 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
+// Redux
 import { connect } from 'react-redux';
 import { getLogs, deleteLog } from '../actions/logActions';
 import { clearErrors } from '../actions/errorActions';
 
+// Material UI
 import {
-    Button,
     CircularProgress,
-    Collapse,
     Container,
     Fab,
-    List,
-    ListItem,
-    ListItemText,
-    ListSubheader,
-    Typography,
+    Typography
 } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CloseIcon from '@material-ui/icons/Close';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
 import { makeStyles } from '@material-ui/styles';
+
+// Components
+import Logs from './Logs';
 import FlightLogSummary from './FlightLogSummary';
 import FlightLog from './FlightLog';
 import DeleteConfirmation from './DeleteConfirmation';
@@ -49,14 +46,6 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         justifyContent: 'center'
     },
-    month: {
-        top: 68,
-        zIndex: 2,
-        justifyContent: 'space-between',
-        borderBottom: '1px solid #777',
-        borderRadius: 0,
-        color: `${theme.palette.primary.light}`,
-    },
     progress: {
       position: 'absolute',
       top: '40%',
@@ -75,23 +64,11 @@ const useStyles = makeStyles(theme => ({
                 backgroundColor: '#555'
             }
         }
-    },
-    year: {
-        top: 8,
-        marginTop: 4,
-        zIndex: 3,
-        border: `2px solid ${theme.palette.secondary.main}`
     }
 }));
 
-const monthNames = [ "January", "February", "March", "April", "May", "June", 
-    "July", "August", "September", "October", "November", "December" ];
-const today = new Date();
-
 const Logbook = ({ getLogs, logs, deleteLog, error, clearErrors }) => {
     const [logsLoaded, setLogsLoaded] = useState(false);
-    const [openYear, setOpenYear] = useState(`year-${today.getFullYear()}`);
-    const [openMonth, setOpenMonth] = useState(`${today.getFullYear()}-${today.getMonth()}`);
     const [selectedLog, setSelectedLog] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const [showDelConf, setShowDelConf] = useState(false);
@@ -104,63 +81,6 @@ const Logbook = ({ getLogs, logs, deleteLog, error, clearErrors }) => {
         }
     }, [getLogs, logsLoaded]);
 
-    const renderLogs = () => {
-        const years = {};
-
-        logs.forEach(log => {
-            const date = new Date(log.date);
-            const year = date.getFullYear();
-            const month = date.getMonth();
-        
-            if (!years[year]) {
-                years[year] = [...Array(12)].map(y => []);
-            }
-        
-            years[year][month].push(
-                <ListItem button key={log._id}
-                    onClick={() => setSelectedLog(log)}
-                >
-                    <ListItemText primary={date.toLocaleDateString()} />
-                </ListItem>
-            );
-        });
-        
-        return Object.keys(years).map(year => {
-            return (
-                <li key={`year-${year}`}>
-                    <List>
-                        <ListSubheader component={Button}
-                            className={classes.year}
-                            onClick={() => setOpenYear(openYear !== `year-${year}` ? `year-${year}` : '')}
-                        >
-                            {year}
-                        </ListSubheader>
-                        <Collapse in={openYear === `year-${year}`}>
-                            {years[year].map((month, index) => {
-                                return (
-                                    <li key={`month-${monthNames[index]}`}>
-                                        <ul>
-                                            <ListSubheader component={Button}
-                                                className={classes.month}
-                                                onClick={() => setOpenMonth(openMonth !== `${year}-${index}` ? `${year}-${index}` : '')}
-                                            >
-                                                {monthNames[index]}
-                                                {openMonth === `${year}-${index}` ? <ExpandLess /> : <ExpandMore />}
-                                            </ListSubheader>
-                                            <Collapse key={`month-${index}`} in={openMonth === `${year}-${index}`}>
-                                                {month}
-                                            </Collapse>
-                                        </ul>
-                                    </li>
-                                );
-                            })}
-                        </Collapse>
-                    </List>
-                </li>
-            );
-        }).reverse();
-    }
-    
     const handleDelete = () => {
         if (selectedLog) {
             deleteLog(selectedLog._id)
@@ -180,9 +100,7 @@ const Logbook = ({ getLogs, logs, deleteLog, error, clearErrors }) => {
             ? (
                 <Container className={classes.root}>
                     <Typography variant="h4" align="center">Logbook</Typography>
-                    <List subheader={<li />} style={{ marginTop: 16 }}>
-                        {renderLogs()}
-                    </List>
+                    <Logs logs={logs} handleClick={setSelectedLog} />
                     <DeleteErrorDialog
                         open={error.id === 'DELETE_LOG_FAIL'}
                         close={clearErrors}

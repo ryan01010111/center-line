@@ -7,6 +7,7 @@ import AddIcon from '@material-ui/icons/Add';
 const Dashboard = () => {
     return (
         <Container>
+            <img src="../../static/client/plane_logo.png" alt="plane logo"/>
             <Tooltip title="New Log" aria-label="new log">
                 <Fab color="primary"
                     aria-label="add"
