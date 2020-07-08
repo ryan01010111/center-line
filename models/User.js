@@ -1,14 +1,15 @@
 import mongoose, {Schema} from 'mongoose';
-import FlightLogSchema from './FlightLogSchema';
 
 const UserSchema = new Schema({
     firstName: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     lastName: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     email: {
         type: String,
@@ -19,7 +20,11 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
-    logs: [FlightLogSchema]
+    course: {
+        type: Schema.Types.ObjectId,
+        ref: 'Course'
+    },
+    progress: Number
 });
 
 const User = mongoose.model('User', UserSchema);

@@ -1,6 +1,7 @@
-import { Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 const FlightLogSchema = new Schema({
+    user: mongoose.Schema.Types.ObjectId,
     date: Date,
     type: String,
     route: String,
@@ -26,4 +27,5 @@ const FlightLogSchema = new Schema({
     instrumentApproach: Number,
 });
 
-export default FlightLogSchema;
+const FlightLog = mongoose.model('FlightLog', FlightLogSchema);
+export default FlightLog;
