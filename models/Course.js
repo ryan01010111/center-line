@@ -4,7 +4,8 @@ const CourseSchema = new Schema({
     name: {
         type: String,
         required: true
-    }
+    },
+    requirements: Object
 });
 
 const Course = mongoose.model('Course', CourseSchema);

@@ -23,8 +23,7 @@ const UserSchema = new Schema({
     course: {
         type: Schema.Types.ObjectId,
         ref: 'Course'
-    },
-    progress: Number
+    }
 });
 
 const User = mongoose.model('User', UserSchema);

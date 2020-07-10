@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 import auth from '../../middleware/auth';
 import User from '../../models/User';
 import FlightLog from '../../models/FlightLog';
-import Course from '../../models/Course';
 
 const router = Router();
 
@@ -11,79 +10,6 @@ const router = Router();
 // @desc    fetch all logs
 // @access  Private
 router.get('/', auth, (req, res) => {
-    // Promise.all([
-    //     User.findById(req.user.id)
-    //         .populate('course'),
-    //     FlightLog.aggregate([
-    //         {
-    //             "$match": {
-    //                 "user": mongoose.Types.ObjectId(req.user.id)
-    //             },
-    //         },
-    //         {
-    //             "$unwind": {
-    //                 "path": "$ccAdditional",
-    //                 "preserveNullAndEmptyArrays": true
-    //             }
-    //         },
-    //         {
-    //             "$group": {
-    //                 "_id": null,
-    //                 "totalHours": { "$sum": "$duration" },
-    //                 "dual": { "$sum": "$duration" },
-    //                 "pic": { "$sum": "$pic" },
-    //                 "night": { "$sum": "$nightTime" },
-    //                 "ccDual": { "$sum": "$ccDual" },
-    //                 "ccSolo": { "$sum": "$ccSolo" },
-    //                 "maneuver": { "$sum": "$maneuver" },
-    //                 "takeoffNight": { "$sum": "$takeoffNight" },
-    //                 "landNight": { "$sum": "$landNight" },
-    //                 "takeoffTower": { "$sum": "$takeoffTower" },
-    //                 "landTower": { "$sum": "$landTower" },
-    //                 "cca": { "$push": "$ccAdditional" },
-    //                 "type": { "$push": "$type" }
-    //             }
-    //         },
-    //         {
-    //             "$project": {
-    //                 "_id": 0,
-    //                 "totalHours": 1,
-    //                 "dual": 1,
-    //                 "pic": 1,
-    //                 "night": 1,
-    //                 "ccDual": 1,
-    //                 "ccSolo": 1,
-    //                 "maneuver": 1,
-    //                 "takeoffNight": 1,
-    //                 "landNight": 1,
-    //                 "takeoffTower": 1,
-    //                 "landTower": 1,
-    //                 "ccNight": {
-    //                     "$size": { "$filter": { "input": "$cca", "as": "c", "cond": { "$eq": [ "$$c", "night" ] } } }
-    //                 },
-    //                 "cc150": {
-    //                     "$size": { "$filter": { "input": "$cca", "as": "c", "cond": { "$eq": [ "$$c", "150nm" ] } } }
-    //                 },
-    //                 "exam": {
-    //                     "$size": { "$filter": { "input": "$type", "as": "t", "cond": { "$eq": [ "$$t", "exam" ] } } }
-    //                 },
-    //                 "checkride": {
-    //                     "$size": { "$filter": { "input": "$type", "as": "t", "cond": { "$eq": [ "$$t", "checkride" ] } } }
-    //                 },
-    //                 "checkridePrep": {
-    //                     "$size": { "$filter": { "input": "$type", "as": "t", "cond": { "$eq": [ "$$t", "checkridePrep" ] } } }
-    //                 },
-    //             }
-    //         }
-    //     ])
-    // ])
-    // .then(result => {
-    //     res.json({
-    //         course: result[0].course,
-    //         totals: result[1][0]
-    //     });
-    // })
-    // .catch(err => res.json(err));
     FlightLog.find({ "user": mongoose.Types.ObjectId(req.user.id) })
         .sort('-date')
         .then(logs => res.json(logs))
