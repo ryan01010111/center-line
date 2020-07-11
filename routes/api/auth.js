@@ -3,8 +3,8 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import auth from '../../middleware/auth';
-import getData from '../../middleware/getData';
 import User from '../../models/User';
+import Course from '../../models/Course';
 
 const router = Router();
 dotenv.config();
@@ -20,6 +20,7 @@ router.post('/login', (req, res) => {
     }
 
     User.findOne({ email })
+        .populate('course', Course)
         .then(user => {
             if (!user) {
                 return res.status(400).json({ error: 'invalid credentials' });
@@ -43,17 +44,14 @@ router.post('/login', (req, res) => {
                                     id: user.id,
                                     firstName: user.firstName,
                                     lastName: user.lastName,
-                                    email: user.email
+                                    email: user.email,
+                                    course: user.course
                                 }
                             });
                         }
                     )
                 })
         }).catch(err => res.json(err));
-});
-
-router.get('/test', auth, getData, (req, res) => {
-    res.json(res.locals);
 });
 
 // @route   POST api/auth/register
@@ -81,7 +79,8 @@ router.post('/register', (req, res) => {
                         firstName,
                         lastName,
                         email,
-                        password: hash
+                        password: hash,
+                        course: null
                     });
                     newUser.save()
                         .then(user => {
@@ -114,6 +113,7 @@ router.post('/register', (req, res) => {
 // @access  Private
 router.get('/user', auth, (req, res) => {
     User.findById(req.user.id)
+        .populate('course', Course)
         .select('-password')
         .then(user => res.json(user))
         .catch(err => res.json(err));

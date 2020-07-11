@@ -15,3 +15,9 @@ export const LOGS_LOADED = 'LOGS_LOADED';
 export const ADD_LOG = 'ADD_LOG';
 export const UPDATE_LOG = 'UPDATE_LOG';
 export const DELETE_LOG = 'DELETE_LOG';
+export const ADD_LOG_FAIL = 'ADD_LOG_FAIL';
+export const UPDATE_LOG_FAIL = 'UPDATE_LOG_FAIL';
+export const DELETE_LOG_FAIL = 'DELETE_LOG_FAIL';
+
+export const COURSES_LOADING = 'COURSES_LOADING';
+export const COURSES_LOADED = 'COURSES_LOADED';

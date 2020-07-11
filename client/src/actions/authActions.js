@@ -9,6 +9,8 @@ import {
     LOGOUT_SUCCESS
 } from './types';
 import { returnErrors, clearErrors } from './errorActions';
+import { getLogs } from './logActions';
+import { getCourses } from './courseActions';
 
 // request config with token
 export const tokenConfig = (method, getState) => {
@@ -39,6 +41,8 @@ export const loadUser = () => async (dispatch, getState) => {
             type: USER_LOADED,
             payload: data
         });
+        dispatch(getLogs());
+        dispatch(getCourses());
     } else {
         localStorage.removeItem('token');
         dispatch(returnErrors(data.error, res.status));
@@ -73,6 +77,7 @@ export const login = ({ email, password, rememberUser }) => async dispatch => {
             type: LOGIN_SUCCESS,
             payload: data
         });
+        dispatch(getLogs());
     } else {
         dispatch(returnErrors(data.error, res.status, 'LOGIN_FAIL'));
         dispatch({

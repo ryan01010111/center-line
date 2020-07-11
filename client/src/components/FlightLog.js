@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
+// Redux
 import { connect } from 'react-redux';
 import { addLog } from '../actions/logActions';
 import { updateLog } from '../actions/logActions';
 import { clearErrors } from '../actions/errorActions';
 
+// Material UI
 import { Container, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
-import FlightLogForm1 from './FlightLogForm1'
-import FlightLogForm2 from './FlightLogForm2'
-import FlightLogForm3 from './FlightLogForm3'
+
+// Components
+import FlightLogForm1 from './FlightLogForm1';
+import FlightLogForm2 from './FlightLogForm2';
+import FlightLogForm3 from './FlightLogForm3';
 import FormStepButtons from './FormStepButtons';
-import FlightLogSummary from './FlightLogSummary'
+import FlightLogSummary from './FlightLogSummary';
 import AddErrorDialog from './AddErrorDialog';
 import AddSuccessDialog from './AddSuccessDialog';
 

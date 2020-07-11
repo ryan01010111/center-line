@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 // Redux
 import { connect } from 'react-redux';
-import { getLogs, deleteLog } from '../actions/logActions';
+import { deleteLog } from '../actions/logActions';
 import { clearErrors } from '../actions/errorActions';
 
 // Material UI
 import {
-    CircularProgress,
     Container,
     Fab,
     Typography
@@ -67,19 +66,20 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Logbook = ({ getLogs, logs, deleteLog, error, clearErrors }) => {
-    const [logsLoaded, setLogsLoaded] = useState(false);
+const Logbook = ({ logs, deleteLog, error, clearErrors }) => {
     const [selectedLog, setSelectedLog] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const [showDelConf, setShowDelConf] = useState(false);
     const [deleteSuccess, setDeleteSuccess] = useState(false);
 
-    useEffect(() => {
-        if (!logsLoaded) {
-            getLogs()
-                .then(() => setLogsLoaded(true));
-        }
-    }, [getLogs, logsLoaded]);
+    const viewLog = log => {
+        setSelectedLog(log);
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+        });
+    }
 
     const handleDelete = () => {
         if (selectedLog) {
@@ -91,64 +91,59 @@ const Logbook = ({ getLogs, logs, deleteLog, error, clearErrors }) => {
     
     const classes = useStyles();
 
-    return !logsLoaded
+    return !selectedLog
         ? (
-            <CircularProgress className={classes.progress}
-              color="secondary"
-            />
-        ) : !selectedLog
+            <Container className={classes.root}>
+                <Typography variant="h4" align="center">Logbook</Typography>
+                <Logs logs={logs} handleClick={viewLog} />
+                <DeleteErrorDialog
+                    open={error.id === 'DELETE_LOG_FAIL'}
+                    close={clearErrors}
+                />
+                <DeleteSuccessDialog
+                    open={deleteSuccess}
+                    close={() => setDeleteSuccess(false)}
+                />
+            </Container>
+        ) : !editMode
             ? (
-                <Container className={classes.root}>
-                    <Typography variant="h4" align="center">Logbook</Typography>
-                    <Logs logs={logs} handleClick={setSelectedLog} />
-                    <DeleteErrorDialog
-                        open={error.id === 'DELETE_LOG_FAIL'}
-                        close={clearErrors}
+                <Container>
+                    <FlightLogSummary
+                        data={selectedLog}
+                        fromLogbook={true}
+                        closeSummary={() => setSelectedLog(null)}
                     />
-                    <DeleteSuccessDialog
-                        open={deleteSuccess}
-                        close={() => setDeleteSuccess(false)}
-                    />
-                </Container>
-            ) : !editMode
-                ? (
-                    <Container>
-                        <FlightLogSummary
-                            data={selectedLog}
-                            fromLogbook={true}
-                            closeSummary={() => setSelectedLog(null)}
+                    <div className={classes.actionBtns}>
+                        <Fab color="secondary" aria-label="edit"
+                            onClick={() => setEditMode(true)}
+                        >
+                            <EditIcon />
+                        </Fab>
+                        <Fab color="default" aria-label="delete"
+                            onClick={() => setShowDelConf(true)}
+                        >
+                            <DeleteIcon />
+                        </Fab>
+                        <DeleteConfirmation
+                            open={showDelConf}
+                            close={() => setShowDelConf(false)}
+                            handleDelete={() => handleDelete()}
                         />
-                        <div className={classes.actionBtns}>
-                            <Fab color="secondary" aria-label="edit"
-                                onClick={() => setEditMode(true)}
-                            >
-                                <EditIcon />
-                            </Fab>
-                            <Fab color="default" aria-label="delete"
-                                onClick={() => setShowDelConf(true)}
-                            >
-                                <DeleteIcon />
-                            </Fab>
-                            <DeleteConfirmation
-                                open={showDelConf}
-                                close={() => setShowDelConf(false)}
-                                handleDelete={() => handleDelete()}
-                            />
-                        </div>
-                    </Container>
-                ) : (
-                    <Container>
-                        <FlightLog log={selectedLog} />
-                        <div className={classes.cancelEditBtn}>
-                            <Fab size="small" color="default"
-                                aria-label="cancel"
-                                onClick={() => setEditMode(false)}
-                            >
-                                <CloseIcon />
-                            </Fab>
-                        </div>
-                    </Container>
-                )
+                    </div>
+                </Container>
+            ) : (
+                <Container>
+                    <FlightLog log={selectedLog} />
+                    <div className={classes.cancelEditBtn}>
+                        <Fab size="small" color="default"
+                            aria-label="cancel"
+                            onClick={() => setEditMode(false)}
+                        >
+                            <CloseIcon />
+                        </Fab>
+                    </div>
+                </Container>
+            )
 }
 
 // PropTypes
@@ -156,7 +151,6 @@ Logbook.propTypes = {
     clearErrors: PropTypes.func.isRequired,
     deleteLog: PropTypes.func.isRequired,
     error: PropTypes.object.isRequired,
-    getLogs: PropTypes.func.isRequired,
     logs: PropTypes.array.isRequired
 }
 
@@ -166,5 +160,5 @@ const mapStateToProps = state => ({
 });
 export default connect(
     mapStateToProps,
-    { getLogs, deleteLog, clearErrors }
+    { deleteLog, clearErrors }
 )(Logbook);

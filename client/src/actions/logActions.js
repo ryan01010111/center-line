@@ -1,14 +1,38 @@
-import { LOGS_LOADING, LOGS_LOADED, ADD_LOG, UPDATE_LOG, DELETE_LOG } from './types';
+import {
+    LOGS_LOADING,
+    LOGS_LOADED,
+    ADD_LOG,
+    UPDATE_LOG,
+    DELETE_LOG,
+    ADD_LOG_FAIL,
+    UPDATE_LOG_FAIL,
+    DELETE_LOG_FAIL
+} from './types';
 import { returnErrors, clearErrors } from './errorActions';
 import { tokenConfig } from './authActions';
+
+function calcProgress(totals, getState) {
+    const reqs = getState().auth.user.course.requirements;
+    let numOfReqs = Object.keys(reqs).length;
+    let avg = 0;
+    for (let [key, value] of Object.entries(reqs)) {
+        if (totals[key] >= value) {
+            avg += 1;
+        } else {
+            avg += (totals[key] / value) 
+        }
+    }
+    return Math.round((avg / numOfReqs) * 100);
+}
 
 export const getLogs = () => async (dispatch, getState) => {
     dispatch({ type: LOGS_LOADING });
 
-    const res = await fetch('/api/logs', tokenConfig('GET', getState));
+    const res = await fetch('/api/logs/data', tokenConfig('GET', getState));
     const data = await res.json();
 
     if (res.status === 200) {
+        data.progress = calcProgress(data.totals, getState);
         dispatch({
             type: LOGS_LOADED,
             payload: data
@@ -26,6 +50,7 @@ export const addLog = fields => async (dispatch, getState) => {
     const data = await res.json();
 
     if (res.status === 200) {
+        data.progress = calcProgress(data.totals, getState);
         dispatch({
             type: ADD_LOG,
             payload: data
@@ -33,7 +58,7 @@ export const addLog = fields => async (dispatch, getState) => {
         dispatch(clearErrors());
         return true;
     } else {
-        dispatch(returnErrors(data.error, res.status, 'ADD_LOG_FAIL'));
+        dispatch(returnErrors(data.error, res.status, ADD_LOG_FAIL));
         return false;
     }
 }
@@ -45,6 +70,7 @@ export const updateLog = (fields, id) => async (dispatch, getState) => {
     const data = await res.json();
 
     if (res.status === 200) {
+        data.progress = calcProgress(data.totals, getState);
         dispatch({
             type: UPDATE_LOG,
             payload: data
@@ -52,7 +78,7 @@ export const updateLog = (fields, id) => async (dispatch, getState) => {
         dispatch(clearErrors());
         return true;
     } else {
-        dispatch(returnErrors(data.error, res.status, 'UPDATE_LOG_FAIL'));
+        dispatch(returnErrors(data.error, res.status, UPDATE_LOG_FAIL));
         return false;
     }
 }
@@ -62,14 +88,15 @@ export const deleteLog = id => async (dispatch, getState) => {
     const data = await res.json();
 
     if (res.status === 200) {
+        data.progress = calcProgress(data.totals, getState);
         dispatch({
             type: DELETE_LOG,
-            payload: data._id
+            payload: data
         });
         dispatch(clearErrors());
         return true;
     } else {
-        dispatch(returnErrors(data.error, res.status, 'DELETE_LOG_FAIL'));
+        dispatch(returnErrors(data.error, res.status, DELETE_LOG_FAIL));
         return false;
     }
 }

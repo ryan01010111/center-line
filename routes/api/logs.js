@@ -1,10 +1,17 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
 import auth from '../../middleware/auth';
-import User from '../../models/User';
+import getData from '../../middleware/getData';
 import FlightLog from '../../models/FlightLog';
 
 const router = Router();
+
+// @route   GET api/logs/data
+// @desc    fetch all logs and aggregated log data
+// @access  Private
+router.get('/data', auth, getData, (req, res) => {
+    res.json(res.locals);
+});
 
 // @route   GET api/logs
 // @desc    fetch all logs
@@ -19,11 +26,8 @@ router.get('/', auth, (req, res) => {
 // @desc    fetch one log
 // @access  Private
 router.get('/:id', auth, (req, res) => {
-    User.findById(req.user.id)
-        .then(user => {
-            const log = user.logs.id(req.params.id);
-            res.json(log);
-        })
+    FlightLog.findById(req.params.id)
+        .then(log => res.json(log))
         .catch(err => res.json(err));
 });
 
@@ -31,12 +35,12 @@ router.get('/:id', auth, (req, res) => {
 // @desc    create log
 // @access  Private
 router.post('/', auth, (req, res) => {
-    User.findById(req.user.id)
-        .then(user => {
-            const newLog = req.body.fields;
-            user.logs.push(newLog);
-            user.save();
-            res.json(user.logs[user.logs.length - 1]);
+    const newLog = new FlightLog({ user: mongoose.Types.ObjectId(req.user.id) });
+    Object.assign(newLog, req.body.fields);
+    newLog.save()
+        .then(() => {
+            const next = () => res.json(res.locals);
+            getData(req, res, next);
         })
         .catch(err => res.json(err));
 });
@@ -47,14 +51,16 @@ router.post('/', auth, (req, res) => {
 router.put('/:id', auth, (req, res) => {
     const fields = req.body.fields;
 
-    User.findById(req.user.id)
-        .then(user => {
-            let log = user.logs.id(req.params.id);
+    FlightLog.findById(req.params.id)
+        .then(log => {
             for (let [key, value] of Object.entries(fields)) {
                 log[key] = value;
             };
-            user.save();
-            res.json(log);
+            log.save()
+                .then(() => {
+                    const next = () => res.json(res.locals);
+                    getData(req, res, next);
+                });
         })
         .catch(err => res.json(err));
 });
@@ -63,12 +69,11 @@ router.put('/:id', auth, (req, res) => {
 // @desc    delete log
 // @access  Private
 router.delete('/:id', auth, (req, res) => {
-    User.findById(req.user.id)
-        .then(user => {
-            user.logs.pull(req.params.id);
-            user.save();
+    FlightLog.deleteOne({ _id: req.params.id })
+        .then(() => {
+            const next = () => res.json(res.locals);
+            getData(req, res, next);
         })
-        .then(() => res.json({ _id: req.params.id }))
         .catch(err => res.json(err));
 });
 

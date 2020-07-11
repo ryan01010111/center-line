@@ -1,8 +1,9 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import auth from './routes/api/auth';
 import logs from './routes/api/logs';
-import users from './routes/api/auth';
+import courses from './routes/api/courses';
 
 // startup config
 const app = express();
@@ -26,7 +27,8 @@ app.use(express.json());
 
 // routes
 app.use('/api/logs', logs);
-app.use('/api/auth', users);
+app.use('/api/auth', auth);
+app.use('/api/courses', courses);
 
 
 app.listen(PORT, () => console.log(`Running on port ${PORT}`));
