@@ -6,10 +6,11 @@ import {
     AUTH_ERROR,
     LOGIN_FAIL,
     REGISTER_FAIL,
-    LOGOUT_SUCCESS
+    LOGOUT_SUCCESS,
+    SET_COURSE
 } from './types';
 import { returnErrors, clearErrors } from './errorActions';
-import { getLogs } from './logActions';
+import { getLogs, updateProgress } from './logActions';
 import { getCourses } from './courseActions';
 
 // request config with token
@@ -118,5 +119,22 @@ export const register = userData => async dispatch => {
         dispatch({
             type: REGISTER_FAIL
         });
+    }
+}
+
+export const setCourse = _id => async (dispatch, getState) => {
+    const config = tokenConfig('POST', getState);
+    config.body = JSON.stringify({ _id });
+    const res = await fetch('/api/courses/assign', config);
+    const data = await res.json();
+
+    if (res.status === 200) {
+        dispatch({
+            type: SET_COURSE,
+            payload: data
+        });
+        dispatch(updateProgress());
+    } else {
+        dispatch(returnErrors(data.error, res.status, 'SET_COURSE_FAIL'));
     }
 }

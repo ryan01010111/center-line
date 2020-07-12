@@ -22,11 +22,12 @@ const ProgressRing = ({ progress }) => {
             display="inline-flex"
             width="100%"
             justifyContent="center"
+            marginBottom={2}
         >
             <Paper className={classes.paper} elevation={3}>
                 <CircularProgress variant="static"
-                    color="secondary"
-                    value={progress}
+                    color={(progress || progress === 0) ? "secondary" : "inherit"}
+                    value={(progress || progress === 0) ? progress : 70}
                     size={80}
                 />
                 <Box
@@ -40,7 +41,7 @@ const ProgressRing = ({ progress }) => {
                     justifyContent="center"
                 >
                     <Typography variant="h6" component="div" color="textSecondary">
-                        {progress}%
+                        {(progress || progress === 0) ? `${progress}%` : 'N/A'}
                     </Typography>
                 </Box>
                 <Typography variant="h6"></Typography>
@@ -51,7 +52,7 @@ const ProgressRing = ({ progress }) => {
 
 // PropTypes
 ProgressRing.propTypes = {
-    progress: PropTypes.number.isRequired
+    progress: PropTypes.number
 }
 
 export default ProgressRing;

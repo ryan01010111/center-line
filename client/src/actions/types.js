@@ -6,6 +6,7 @@ export const AUTH_ERROR = 'AUTH_ERROR';
 export const LOGIN_FAIL = 'LOGIN_FAIL';
 export const REGISTER_FAIL = 'REGISTER_FAIL';
 export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS';
+export const SET_COURSE = 'SET_COURSE';
 
 export const GET_ERRORS = 'GET_ERRORS';
 export const CLEAR_ERRORS = 'CLEAR_ERRORS';
@@ -18,6 +19,7 @@ export const DELETE_LOG = 'DELETE_LOG';
 export const ADD_LOG_FAIL = 'ADD_LOG_FAIL';
 export const UPDATE_LOG_FAIL = 'UPDATE_LOG_FAIL';
 export const DELETE_LOG_FAIL = 'DELETE_LOG_FAIL';
+export const UPDATE_PROGRESS = 'UPDATE_PROGRESS';
 
 export const COURSES_LOADING = 'COURSES_LOADING';
 export const COURSES_LOADED = 'COURSES_LOADED';

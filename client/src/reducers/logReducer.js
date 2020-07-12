@@ -3,12 +3,14 @@ import {
     LOGS_LOADED,
     ADD_LOG,
     UPDATE_LOG,
-    DELETE_LOG
+    DELETE_LOG,
+    UPDATE_PROGRESS
 } from '../actions/types';
 
 const initialState = {
     logs: [],
-    progress: 0,
+    progress: null,
+    totals: null,
     isLoading: false
 }
 
@@ -24,6 +26,7 @@ export default (state = initialState, action) => {
                 ...state,
                 logs: action.payload.logs,
                 progress: action.payload.progress,
+                totals: action.payload.totals,
                 isLoading: false
             };
         case ADD_LOG:
@@ -32,7 +35,13 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 logs: action.payload.logs,
-                progress: action.payload.progress
+                progress: action.payload.progress,
+                totals: action.payload.totals
+            }
+        case UPDATE_PROGRESS:
+            return {
+                ...state,
+                progress: action.payload
             }
         default:
             return state;

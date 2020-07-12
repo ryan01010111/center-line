@@ -6,7 +6,8 @@ import {
     AUTH_ERROR,
     LOGIN_FAIL,
     REGISTER_FAIL,
-    LOGOUT_SUCCESS
+    LOGOUT_SUCCESS,
+    SET_COURSE
 } from '../actions/types';
 
 const initialState = {
@@ -49,6 +50,11 @@ export default (state = initialState, action) => {
                 token: null,
                 user: null
             };
+        case SET_COURSE:
+            return {
+                ...state,
+                user: action.payload
+            }
         default:
             return state;
     }

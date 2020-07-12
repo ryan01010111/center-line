@@ -2,9 +2,13 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
+import logo from '../../static/client/centerline-logo-name.png';
+
+// Redux
 import { connect } from 'react-redux';
 import { logout } from '../../actions/authActions';
 
+// Material UI
 import { makeStyles } from '@material-ui/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import {
@@ -12,16 +16,18 @@ import {
     Button,
     IconButton,
     Toolbar,
-    Typography
 } from '@material-ui/core';
+
+// Components
 import MenuIcon from '@material-ui/icons/Menu';
 import NavMenu from './NavMenu';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
     logo: {
       flexGrow: 1,
-      color: theme.palette.primary.contrastText,
-      textDecoration: 'none'
+      '& img': {
+          width: 120
+      }
     },
     menuButton: {
         marginLeft: 32,
@@ -70,13 +76,18 @@ const Header = ({ isAuthenticated, logout, user }) => {
     return (
         <AppBar position="static">
             <Toolbar>
-                <Typography className={classes.logo}
+                {/* <Typography className={classes.logo}
                     variant="h4"
                     component={Link}
                     to="/"
                 >
                     Center Line
-                </Typography>
+                </Typography> */}
+                <div className={classes.logo}>
+                    <Link to="/">
+                        <img src={logo} alt="logo" />
+                    </Link>
+                </div>
                 {isAuthenticated ? (!smallDisplay && authLinks) : unauthLinks}
                 {isAuthenticated && (
                     <>

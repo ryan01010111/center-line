@@ -6,17 +6,27 @@ import {
     DELETE_LOG,
     ADD_LOG_FAIL,
     UPDATE_LOG_FAIL,
-    DELETE_LOG_FAIL
+    DELETE_LOG_FAIL,
+    UPDATE_PROGRESS
 } from './types';
 import { returnErrors, clearErrors } from './errorActions';
 import { tokenConfig } from './authActions';
 
 function calcProgress(totals, getState) {
-    const reqs = getState().auth.user.course.requirements;
+    const course = getState().auth.user.course;
+    if (!course) {
+        return null;
+    }
+    if (!totals) {
+        return 0;
+    }
+    const reqs = course.requirements;
     let numOfReqs = Object.keys(reqs).length;
     let avg = 0;
     for (let [key, value] of Object.entries(reqs)) {
-        if (totals[key] >= value) {
+        if (!totals[key]) {
+            avg += 0;
+        } else if (totals[key] >= value) {
             avg += 1;
         } else {
             avg += (totals[key] / value) 
@@ -32,6 +42,9 @@ export const getLogs = () => async (dispatch, getState) => {
     const data = await res.json();
 
     if (res.status === 200) {
+        if (!data.logs) {
+            data.logs = [];
+        }
         data.progress = calcProgress(data.totals, getState);
         dispatch({
             type: LOGS_LOADED,
@@ -88,6 +101,9 @@ export const deleteLog = id => async (dispatch, getState) => {
     const data = await res.json();
 
     if (res.status === 200) {
+        if (!data.logs) {
+            data.logs = [];
+        }
         data.progress = calcProgress(data.totals, getState);
         dispatch({
             type: DELETE_LOG,
@@ -99,4 +115,14 @@ export const deleteLog = id => async (dispatch, getState) => {
         dispatch(returnErrors(data.error, res.status, DELETE_LOG_FAIL));
         return false;
     }
+}
+
+export const updateProgress = () => (dispatch, getState) => {
+    const totals = getState().log.totals;
+    const progress = calcProgress(totals, getState);
+
+    dispatch({
+        type: UPDATE_PROGRESS,
+        payload: progress
+    });
 }
