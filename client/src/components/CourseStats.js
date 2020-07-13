@@ -68,7 +68,7 @@ const CourseStats = ({ reqs, totals }) => {
                     </Grid>
                 </Grid>
                 {minDisplayMd && (
-                    <Grid container item xs={12} md={6}>
+                    <Grid container item xs={12} md={6} style={{ paddingLeft: 20 }}>
                         <Grid item xs={5} />
                         <Grid item xs={1} />
                         <Grid item xs={2}>

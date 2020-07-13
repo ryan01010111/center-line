@@ -1,0 +1,16 @@
+@keyframes load {
+    from {
+        transform: rotate(0)
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loadingAnimation {
+    position: absolute;
+    width: 200px;
+    top: 45%;
+    left: calc(50% - 100px);
+    animation: load 2s infinite linear;
+}

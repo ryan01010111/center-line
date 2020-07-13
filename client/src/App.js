@@ -1,27 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
+import './App.css';
+
+// Redux
 import { Provider } from 'react-redux';
 import store from './store';
 import { loadUser } from './actions/authActions'
 
-import { CircularProgress } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+// Components
 import ProtectedRoute from './components/ProtectedRoute';
+import Loading from './components/Loading';
 import Dashboard from './components/Dashboard'
 import Header from './components/layout/Header';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Logbook from './components/Logbook';
 import FlightLog from './components/FlightLog';
-
-const useStyles = makeStyles({
-  progress: {
-    position: 'absolute',
-    top: '40%',
-    left: 'calc(50% - 20px)'
-  }
-});
 
 function App() {
   const [authLoaded, setAuthLoaded] = useState(false);
@@ -33,17 +28,13 @@ function App() {
     }
   }, [authLoaded]);
 
-  const classes = useStyles();
-  
   return (
     <Router>
       <Provider store={store}>
         <Header />
         {!authLoaded
           ? (
-            <CircularProgress className={classes.progress}
-              color="secondary"
-            />
+            <Loading />
           ) : (
             <Switch>
               <Route path="/login">
