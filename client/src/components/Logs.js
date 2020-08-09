@@ -50,7 +50,7 @@ const Logs = ({ logs, handleClick }) => {
                             {date.toLocaleDateString()}
                         </Grid>
                         <Grid item xs={4}>
-                            {log.type}
+                            {log.type === 'checkridePrep' ? 'checkride prep' : log.type}
                         </Grid>
                         <Grid item xs={3}>
                             <div style={{ display: 'flex' }}>

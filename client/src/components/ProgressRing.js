@@ -27,7 +27,7 @@ const ProgressRing = ({ progress }) => {
             <Paper className={classes.paper} elevation={3}>
                 <CircularProgress variant="static"
                     color={(progress || progress === 0) ? "secondary" : "inherit"}
-                    value={(progress || progress === 0) ? progress : 70}
+                    value={(progress || progress === 0) ? progress : 56}
                     size={80}
                 />
                 <Box

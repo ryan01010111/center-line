@@ -32,7 +32,7 @@ const useStyles = makeStyles(() => ({
         left: 'calc(100% - 88px)'
     },
     container: {
-        minHeight: 'calc(100vh - 60px)',
+        minHeight: 'calc(100vh - 70px)',
         background: `url(${plane_logo}) center / 54% fixed no-repeat`,
         paddingTop: 60
     },
@@ -45,6 +45,7 @@ const useStyles = makeStyles(() => ({
         marginBottom: 24
     },
     paperMain: {
+        minHeight: 'calc(100vh - 200px)',
         margin: '0 4vw',
         padding: 16,
         backgroundColor: 'transparent'
